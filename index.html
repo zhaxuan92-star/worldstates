@@ -1,15 +1,140 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="vi">
 <head>
-<meta charset="UTF-8">
-<title>WorldStates</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <title>WorldStates — Global Nation Simulator</title>
+  <style>
+    :root{
+      --bg:#07111f;--panel:#0d1b2a;--panel2:#10243a;--line:#1d3853;
+      --text:#eef6ff;--muted:#91a8bd;--accent:#4cc9f0;--accent2:#7c5cff;
+      --good:#38d39f;--warn:#ffd166;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(circle at 80% 0,#132d4a 0,transparent 35%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+    a{color:inherit}
+    .wrap{max-width:1050px;margin:auto;padding:18px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0 24px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));font-size:24px}
+    h1,h2,h3,p{margin-top:0}
+    h1{font-size:23px;margin-bottom:2px}.sub{color:var(--muted);font-size:13px}
+    .badge{border:1px solid var(--line);background:#0a1726;padding:8px 11px;border-radius:999px;color:var(--muted);font-size:12px}
+    .hero{padding:24px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(135deg,#10243a,#0a1726);overflow:hidden;position:relative}
+    .hero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-70px;top:-70px;background:rgba(76,201,240,.12)}
+    .hero h2{font-size:30px;margin-bottom:8px}.hero p{max-width:700px;color:var(--muted);line-height:1.55}
+    .actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+    button{border:0;border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer}
+    .primary{background:var(--accent);color:#03131e}.secondary{background:#172c42;color:var(--text);border:1px solid var(--line)}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+    .stat,.panel{border:1px solid var(--line);background:rgba(13,27,42,.92);border-radius:16px}
+    .stat{padding:16px}.stat small{color:var(--muted);display:block;margin-bottom:7px}.stat strong{font-size:22px}
+    .panel{padding:18px;margin-top:16px}
+    .panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+    .panel-head h2{font-size:18px;margin:0}
+    input{width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--line);background:#071522;color:var(--text);outline:none}
+    input:focus{border-color:var(--accent)}
+    .nation{display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center;padding:13px 0;border-top:1px solid rgba(29,56,83,.65)}
+    .flag{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;background:#173653;font-size:21px}
+    .nation h3{font-size:15px;margin:0 0 4px}.nation p{font-size:12px;color:var(--muted);margin:0}
+    .score{font-weight:800;color:var(--good);font-size:14px}
+    .empty{color:var(--muted);text-align:center;padding:25px 8px}
+    footer{padding:25px 0;color:#647d93;font-size:12px;text-align:center}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;padding:18px;z-index:5}
+    .modal.open{display:flex}.dialog{width:min(440px,100%);background:#0d1b2a;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 20px 70px #000}
+    .field{margin:12px 0}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+    .dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+    @media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}.hero h2{font-size:25px}}
+    @media(max-width:430px){.grid{grid-template-columns:1fr 1fr}.nation{grid-template-columns:auto 1fr}.score{grid-column:2}.hero{padding:19px}}
+  </style>
 </head>
-
 <body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">🌐</div>
+      <div><h1>WorldStates</h1><div class="sub">Global Nation Simulator</div></div>
+    </div>
+    <div class="badge">Prototype v0.2</div>
+  </header>
 
-<h1>Xin chào WorldStates!</h1>
+  <section class="hero">
+    <h2>Xây dựng quốc gia của bạn.</h2>
+    <p>Quản lý các quốc gia, theo dõi chỉ số và mở rộng thế giới của riêng bạn. Đây là nền móng giao diện cho một game mô phỏng quốc gia chạy trực tiếp trên điện thoại.</p>
+    <div class="actions">
+      <button class="primary" onclick="openModal()">＋ Tạo quốc gia</button>
+      <button class="secondary" onclick="resetDemo()">↻ Khôi phục dữ liệu mẫu</button>
+    </div>
+  </section>
 
-<p>Đây là website đầu tiên của tôi.</p>
+  <section class="grid">
+    <div class="stat"><small>🌍 Quốc gia</small><strong id="nationCount">0</strong></div>
+    <div class="stat"><small>👥 Dân số</small><strong id="population">0</strong></div>
+    <div class="stat"><small>💰 GDP</small><strong id="gdp">0</strong></div>
+    <div class="stat"><small>🕊️ Hòa bình</small><strong id="peace">—</strong></div>
+  </section>
 
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Danh sách quốc gia</h2>
+      <div style="width:min(260px,55%)"><input id="search" placeholder="🔎 Tìm quốc gia..." oninput="render()"></div>
+    </div>
+    <div id="nationList"></div>
+  </section>
+
+  <footer>WorldStates • dữ liệu demo lưu cục bộ trên thiết bị • chưa có máy chủ</footer>
+</div>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="dialog">
+    <h2>Tạo quốc gia mới</h2>
+    <div class="field"><label>Tên quốc gia</label><input id="newName" placeholder="Ví dụ: Vzcomm"></div>
+    <div class="field"><label>Thủ đô</label><input id="newCapital" placeholder="Ví dụ: Tân Phong"></div>
+    <div class="dialog-actions">
+      <button class="secondary" onclick="closeModal()">Hủy</button>
+      <button class="primary" onclick="createNation()">Tạo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY="worldstates_demo_v2";
+const seed=[
+  {name:"Vzcomm",capital:"Tân Phong",flag:"🐉",population:499000000,gdp:43.2,peace:72},
+  {name:"Vxphong",capital:"Vĩnh Phong",flag:"🏝️",population:82000000,gdp:8.7,peace:81},
+  {name:"Aurora",capital:"Northlight",flag:"❄️",population:146000000,gdp:18.4,peace:88}
+];
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||seed}catch{return seed}}
+function save(data){localStorage.setItem(KEY,JSON.stringify(data))}
+function fmt(n){return new Intl.NumberFormat("vi-VN",{notation:"compact",maximumFractionDigits:1}).format(n)}
+function render(){
+  const data=load(), q=document.getElementById("search").value.toLowerCase().trim();
+  const filtered=data.filter(x=>(x.name+" "+x.capital).toLowerCase().includes(q));
+  document.getElementById("nationList").innerHTML=filtered.length?filtered.map(x=>`
+    <div class="nation">
+      <div class="flag">${x.flag}</div>
+      <div><h3>${escapeHtml(x.name)}</h3><p>Thủ đô: ${escapeHtml(x.capital)} · Dân số: ${fmt(x.population)}</p></div>
+      <div class="score">Hòa bình ${x.peace}/100</div>
+    </div>`).join(""):'<div class="empty">Không tìm thấy quốc gia.</div>';
+  document.getElementById("nationCount").textContent=data.length;
+  document.getElementById("population").textContent=fmt(data.reduce((a,x)=>a+x.population,0));
+  document.getElementById("gdp").textContent=fmt(data.reduce((a,x)=>a+x.gdp,0))+"T";
+  document.getElementById("peace").textContent=data.length?Math.round(data.reduce((a,x)=>a+x.peace,0)/data.length)+"/100":"—";
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function openModal(){document.getElementById("modal").classList.add("open");document.getElementById("newName").focus()}
+function closeModal(){document.getElementById("modal").classList.remove("open")}
+function createNation(){
+  const name=document.getElementById("newName").value.trim(), capital=document.getElementById("newCapital").value.trim();
+  if(!name||!capital)return;
+  const data=load();
+  if(data.some(x=>x.name.toLowerCase()===name.toLowerCase()))return alert("Tên quốc gia đã tồn tại.");
+  data.push({name,capital,flag:"🌐",population:1000000,gdp:.1,peace:50});
+  save(data);document.getElementById("newName").value="";document.getElementById("newCapital").value="";closeModal();render();
+}
+function resetDemo(){if(confirm("Khôi phục dữ liệu mẫu?")){save(seed);render()}}
+render();
+</script>
 </body>
-  </html>
+</html>
